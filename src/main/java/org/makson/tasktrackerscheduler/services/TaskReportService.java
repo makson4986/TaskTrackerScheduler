@@ -1,6 +1,7 @@
 package org.makson.tasktrackerscheduler.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.makson.tasktrackerscheduler.dto.ReportDto;
 import org.makson.tasktrackerscheduler.dto.TaskDto;
 import org.makson.tasktrackerscheduler.dto.TaskStatus;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskReportService {
@@ -30,8 +32,10 @@ public class TaskReportService {
         List<UserDto> users = apiService.getAllUser();
 
         for (UserDto user : users) {
-            createReport(user)
-                    .ifPresent(report -> kafkaService.send(topicName, report));
+            createReport(user).ifPresent(report -> {
+                kafkaService.send(topicName, report);
+                log.info("A task report for user {} has been sent.", user.email());
+            });
         }
     }
 
