@@ -33,7 +33,7 @@ public class TaskReportService {
 
         for (UserDto user : users) {
             createReport(user).ifPresent(report -> {
-                kafkaService.send(topicName, report);
+                kafkaService.send(topicName, user.email(), report);
                 log.info("A task report for user {} has been sent.", user.email());
             });
         }

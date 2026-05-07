@@ -11,8 +11,8 @@ public class KafkaService {
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public void send(String topic, Object message) {
+    public void send(String topic, String key, Object message) {
         String json = objectMapper.writeValueAsString(message);
-        kafkaTemplate.send(topic, json);
+        kafkaTemplate.send(topic, key, json);
     }
 }
