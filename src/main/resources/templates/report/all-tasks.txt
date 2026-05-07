@@ -1,0 +1,7 @@
+За прошедший день у вас осталось {number_uncompleted_task} невыполненных задач. Выполненных задач у вас {number_completed_task}
+
+Последнии выполненные задачи:
+{list_completed_task}
+
+Последнии невыполненные задачи:
+{list_uncompleted_task}

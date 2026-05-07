@@ -3,3 +3,12 @@ spring:
     name: TaskTrackerScheduler
   main:
     web-application-type: none
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER_URL}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 1
+    topic-name: ${KAFKA_REPORT_TOPIC}
+task-service-url: ${TASK_BACKEND_URL}
+
