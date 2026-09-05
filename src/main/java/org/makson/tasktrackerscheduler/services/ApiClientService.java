@@ -24,12 +24,10 @@ public class ApiClientService {
                 .block();
     }
 
-    public List<TaskDto> getUserTasks(UserDto user, TaskStatus status) {
-        final String uri = "/api/reports/users/%d/tasks?status=%s".formatted(user.id(), status.name());
-
+    public List<TaskDto> getUserTasks(String userId, TaskStatus status) {
         return webClient
                 .get()
-                .uri(uri)
+                .uri("/api/reports/users/{userId}/tasks?status={statusName}", userId, status.name())
                 .retrieve()
                 .bodyToFlux(TaskDto.class)
                 .collectList()
