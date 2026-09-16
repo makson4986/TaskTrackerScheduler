@@ -1,9 +1,8 @@
 package org.makson.tasktrackerscheduler.services;
 
 import lombok.RequiredArgsConstructor;
-import org.makson.tasktrackerscheduler.dto.TaskDto;
-import org.makson.tasktrackerscheduler.dto.TaskStatus;
 import org.makson.tasktrackerscheduler.dto.UserDto;
+import org.makson.tasktrackerscheduler.dto.UserTasksDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -24,12 +23,12 @@ public class ApiClientService {
                 .block();
     }
 
-    public List<TaskDto> getUserTasks(String userId, TaskStatus status) {
+    public List<UserTasksDto.TaskDto> getUserTasks(int userId) {
         return webClient
                 .get()
-                .uri("/api/reports/users/{userId}/tasks?status={statusName}", userId, status.name())
+                .uri("/api/reports/users/{userId}/tasks", userId)
                 .retrieve()
-                .bodyToFlux(TaskDto.class)
+                .bodyToFlux(UserTasksDto.TaskDto.class)
                 .collectList()
                 .block();
     }
