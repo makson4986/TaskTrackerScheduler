@@ -1,18 +1,31 @@
 package org.makson.tasktrackerscheduler.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.core.KafkaTemplate;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.makson.tasktrackerscheduler.dto.ReportDto;
+import org.makson.tasktrackerscheduler.dto.UserTasksDto;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
+import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KafkaService {
-    private final ObjectMapper objectMapper;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    @Value("${spring.kafka.summarization-requests-topic}")
+    private String summarizationRequestsTopic;
+    private final ReplyingKafkaTemplate<String, UserTasksDto, ReportDto> replyingKafkaTemplate;
 
-    public void send(String topic, String key, Object message) {
-        String json = objectMapper.writeValueAsString(message);
-        kafkaTemplate.send(topic, key, json);
+    public ReportDto sendTasksForSummarization(UserTasksDto tasks) throws TimeoutException, ExecutionException, InterruptedException {
+        ProducerRecord<String, UserTasksDto> record = new ProducerRecord<>(summarizationRequestsTopic, tasks.userEmail(), tasks);
+        RequestReplyFuture<String, UserTasksDto, ReportDto> replyFuture = replyingKafkaTemplate.sendAndReceive(record);
+        log.info("Tasks for user '{}' for the period '{}' have been sent for summarization", tasks.userEmail(), tasks.period());
+        return replyFuture.get(1, TimeUnit.MINUTES).value();
     }
 }
