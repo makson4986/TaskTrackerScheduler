@@ -45,7 +45,7 @@ public class ReportService {
     }
 
     public Set<String> getProcessedRecipients() {
-        return reportRepository.findProcessedRecipientsByPeriod(LocalDate.now());
+        return reportRepository.findProcessedRecipientsByPeriod(LocalDate.now().minusDays(1));
     }
 
     public List<ReportDto> getAllReport(LocalDate period) {
