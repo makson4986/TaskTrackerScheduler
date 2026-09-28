@@ -6,6 +6,7 @@ import org.makson.tasktrackerscheduler.dto.ReportDto;
 import org.makson.tasktrackerscheduler.dto.UserDto;
 import org.makson.tasktrackerscheduler.dto.UserTasksDto;
 import org.makson.tasktrackerscheduler.mappers.ReportMapper;
+import org.makson.tasktrackerscheduler.models.Report;
 import org.makson.tasktrackerscheduler.repositories.ReportRepository;
 import org.springframework.stereotype.Service;
 
@@ -45,5 +46,10 @@ public class ReportService {
 
     public Set<String> getProcessedRecipients() {
         return reportRepository.findProcessedRecipientsByPeriod(LocalDate.now());
+    }
+
+    public List<ReportDto> getAllReport(LocalDate period) {
+        List<Report> reports = reportRepository.getAllByPeriod(period);
+        return reportMapper.toListDto(reports);
     }
 }

@@ -1,10 +1,12 @@
 package org.makson.tasktrackerscheduler.services;
 
 import lombok.RequiredArgsConstructor;
+import org.makson.tasktrackerscheduler.dto.ReportDto;
 import org.makson.tasktrackerscheduler.dto.UserDto;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +15,7 @@ import java.util.Set;
 public class SchedulerService {
     private final ApiClientService apiService;
     private final ReportService reportService;
+    private final KafkaService kafkaService;
 
     @Scheduled(cron = "0 0 0 * * *")
     public void sendGenerationRequest() {
@@ -26,8 +29,9 @@ public class SchedulerService {
         });
     }
 
-//    @Scheduled(cron = "0 0 6 * * *")
-//    public void sendCompletedTask() {
-//
-//    }
+    @Scheduled(cron = "0 0 6 * * *")
+    public void sendCompletedTask() {
+        List<ReportDto> reports = reportService.getAllReport(LocalDate.now().minusDays(1));
+        reports.forEach(kafkaService::publishReportCreatedEvent);
+    }
 }
