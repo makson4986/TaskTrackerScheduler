@@ -5,6 +5,7 @@ COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
+COPY version.gradle .
 
 RUN ./gradlew --no-daemon dependencies
 

@@ -14,12 +14,15 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.type.mapping: user_tasks:org.makson.tasktrackerscheduler.dto.UserTasksDto
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.type.mapping: report:org.makson.tasktrackerscheduler.dto.ReportDto
     topics:
       summarization-requests: ${KAFKA_SUMMARIZATION_REQUESTS_TOPIC}
       summarization-responses: ${KAFKA_SUMMARIZATION_RESPONSES_TOPIC}
       email-sending-tasks: ${KAFKA_EMAIL_SENDING_TASKS_TOPIC}
 task-service-url: ${TASK_BACKEND_URL}
-
