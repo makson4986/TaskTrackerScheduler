@@ -2,6 +2,8 @@ package org.makson.tasktrackerscheduler.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,11 +29,12 @@ public class Report {
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDate period = LocalDate.now();
+    @Column(name = "period", nullable = false)
+    private LocalDate period;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "status", nullable = false)
     private ReportStatus status = ReportStatus.PENDING;
 }

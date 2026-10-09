@@ -9,6 +9,7 @@ import org.makson.tasktrackerscheduler.mappers.ReportMapper;
 import org.makson.tasktrackerscheduler.models.Report;
 import org.makson.tasktrackerscheduler.repositories.ReportRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,13 +27,16 @@ public class ReportService {
     private final ReportMapper reportMapper;
     private final ReportRepository reportRepository;
 
+    @Transactional
     public void generateReport(UserDto user) {
         List<UserTasksDto.TaskDto> tasks = apiService.getUserTasks(user.id());
         UserTasksDto userTasks = new UserTasksDto(user.email(), LocalDateTime.now().toString(), tasks);
 
         try {
-            ReportDto report = kafkaService.sendTasksForSummarization(userTasks);
-            reportRepository.save(reportMapper.toModel(report));
+            ReportDto dto = kafkaService.sendTasksForSummarization(userTasks);
+            Report report = reportMapper.toModel(dto);
+            report.setPeriod(LocalDate.now().minusDays(1));
+            reportRepository.save(report);
             log.info("The report for user '{}' has been successfully generated and saved", user.email());
         } catch (TimeoutException e) {
             log.warn("The timeout for a response from the report generation service has expired");

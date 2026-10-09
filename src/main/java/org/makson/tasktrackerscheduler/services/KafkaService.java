@@ -11,6 +11,7 @@ import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 @Service
 @RequiredArgsConstructor
 public class KafkaService {
-    @Value("${spring.kafka.summarization-requests-topic}")
+    @Value("${spring.kafka.topics.summarization-requests}")
     private String summarizationRequestsTopic;
     @Value("${spring.kafka.topics.email-sending-tasks}")
     private String emailSendingTasksTopic;
@@ -28,7 +29,7 @@ public class KafkaService {
 
     public ReportDto sendTasksForSummarization(UserTasksDto tasks) throws TimeoutException, ExecutionException, InterruptedException {
         ProducerRecord<String, UserTasksDto> record = new ProducerRecord<>(summarizationRequestsTopic, tasks.userEmail(), tasks);
-        RequestReplyFuture<String, UserTasksDto, ReportDto> replyFuture = replyingKafkaTemplate.sendAndReceive(record);
+        RequestReplyFuture<String, UserTasksDto, ReportDto> replyFuture = replyingKafkaTemplate.sendAndReceive(record, Duration.ofMinutes(1));
         log.info("Tasks for user '{}' for the period '{}' have been sent for summarization", tasks.userEmail(), tasks.period());
         return replyFuture.get(1, TimeUnit.MINUTES).value();
     }
