@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.makson.tasktrackerscheduler.dto.ReportDto;
 import org.makson.tasktrackerscheduler.dto.UserTasksDto;
+import org.makson.tasktrackerscheduler.exceptions.ReportGenerationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
@@ -12,9 +13,7 @@ import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
@@ -27,11 +26,16 @@ public class KafkaService {
     private final ReplyingKafkaTemplate<String, UserTasksDto, ReportDto> replyingKafkaTemplate;
     private final KafkaTemplate<String, ReportDto> kafkaTemplate;
 
-    public ReportDto sendTasksForSummarization(UserTasksDto tasks) throws TimeoutException, ExecutionException, InterruptedException {
+    public ReportDto sendTasksForSummarization(UserTasksDto tasks) {
         ProducerRecord<String, UserTasksDto> record = new ProducerRecord<>(summarizationRequestsTopic, tasks.userEmail(), tasks);
         RequestReplyFuture<String, UserTasksDto, ReportDto> replyFuture = replyingKafkaTemplate.sendAndReceive(record, Duration.ofMinutes(1));
         log.info("Tasks for user '{}' for the period '{}' have been sent for summarization", tasks.userEmail(), tasks.period());
-        return replyFuture.get(1, TimeUnit.MINUTES).value();
+
+        try {
+            return replyFuture.get(1, TimeUnit.MINUTES).value();
+        } catch (Exception e) {
+            throw new ReportGenerationException(e);
+        }
     }
 
     public void publishReportCreatedEvent(ReportDto report) {
