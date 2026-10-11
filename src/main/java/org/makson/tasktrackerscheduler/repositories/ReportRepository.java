@@ -1,6 +1,7 @@
 package org.makson.tasktrackerscheduler.repositories;
 
 import org.makson.tasktrackerscheduler.models.Report;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +15,6 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
     Set<String> findProcessedRecipientsByPeriod(@Param("period") LocalDate period);
 
     List<Report> getAllByPeriod(LocalDate period);
+
+    Report getByRecipientEmailAndPeriod(String recipientEmail, LocalDate period);
 }

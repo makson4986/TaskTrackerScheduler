@@ -4,15 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class SchedulerService {
     private final ReportGenerationService reportService;
-    private final KafkaService kafkaService;
 
     @Scheduled(cron = "0 0 0 * * *")
     public void sendGenerationRequest() {
-        reportService.generateReports();
+        LocalDate period = LocalDate.now().minusDays(1);
+        reportService.generateReports(period);
     }
 
     @Scheduled(cron = "0 0 6 * * *")

@@ -6,7 +6,6 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -23,18 +22,17 @@ public class Report {
     @Column(name = "recipient_email", nullable = false)
     private String recipientEmail;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
-    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "period", nullable = false)
     private LocalDate period;
 
-    @Builder.Default
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "status", nullable = false)
-    private ReportStatus status = ReportStatus.PENDING;
+    private ReportStatus status;
 }

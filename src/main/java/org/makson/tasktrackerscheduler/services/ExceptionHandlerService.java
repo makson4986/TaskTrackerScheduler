@@ -12,16 +12,7 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 @Service
 public class ExceptionHandlerService {
-    public void handleException(Exception e, UserDto user) {
-        switch (e) {
-            case DatabaseException ex -> handleDatabaseException(ex, user);
-            case ReportGenerationException ex -> handleReportGenerationException(ex, user);
-            default ->
-                    log.error("Unhandled exception during report generation for the user {}: {}", user.email(), e.getStackTrace());
-        }
-    }
-
-    private void handleReportGenerationException(ReportGenerationException e, UserDto user) {
+    public void handleReportGenerationException(ReportGenerationException e, UserDto user) {
         Throwable cause = e.getCause();
 
         switch (cause) {
@@ -36,7 +27,7 @@ public class ExceptionHandlerService {
         }
     }
 
-    private void handleDatabaseException(DatabaseException e, UserDto user) {
+    public void handleDatabaseException(DatabaseException e, UserDto user) {
         log.error("Database exception for user {}: {}, {}", user.email(), e.getCause(), e.getMessage());
     }
 }

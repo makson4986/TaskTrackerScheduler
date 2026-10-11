@@ -1,5 +1,6 @@
 package org.makson.tasktrackerscheduler.mappers;
 
+import org.makson.tasktrackerscheduler.dto.RawReportDto;
 import org.makson.tasktrackerscheduler.dto.ReportDto;
 import org.makson.tasktrackerscheduler.models.Report;
 import org.mapstruct.Mapper;
