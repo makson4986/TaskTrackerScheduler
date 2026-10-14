@@ -1,18 +1,19 @@
 package org.makson.tasktrackerscheduler.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public record UserTasksDto(
         String userEmail,
-        String period,
+        LocalDate period,
         List<TaskDto> tasks
 ) {
     public record TaskDto(
             String title,
             String text,
             TaskStatus status,
-            LocalDateTime performedAt
+            LocalDate createdAt,
+            LocalDate performedAt
     ) {
     }
 }

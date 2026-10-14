@@ -26,7 +26,9 @@ public class ReportService {
     @Transactional
     public void saveAsGenerated(ReportDto dto, LocalDate period) {
         try {
-            Report report = reportMapper.toModel(dto);
+            Report report = reportRepository.getByRecipientEmailAndPeriod(dto.recipientEmail(), period);
+            report.setTitle(dto.title());
+            report.setContent(dto.content());
             report.setPeriod(period);
             report.setStatus(ReportStatus.GENERATED);
             reportRepository.save(report);

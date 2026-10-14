@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.makson.tasktrackerscheduler.dto.RawReportDto;
 import org.makson.tasktrackerscheduler.dto.ReportDto;
-import org.makson.tasktrackerscheduler.dto.UserDto;
 import org.makson.tasktrackerscheduler.dto.UserTasksDto;
 import org.makson.tasktrackerscheduler.exceptions.DatabaseException;
 import org.makson.tasktrackerscheduler.exceptions.ReportGenerationException;
@@ -25,40 +24,37 @@ public class ReportGenerationService {
     private final ExceptionHandlerService exceptionHandlerService;
 
     public void generateReports(LocalDate period) {
-        List<UserDto> users = getUnprocessedUsers(apiService.getAllUser(), period);
-        prepareGeneration(users, period);
-        users.forEach(u -> generateReport(u, period));
+        List<UserTasksDto> userTasks = prepareGeneration(period);
+        userTasks.forEach(t -> generateReport(t, period));
     }
 
-    private void generateReport(UserDto user, LocalDate period) {
-        List<UserTasksDto.TaskDto> tasks = apiService.getUserTasks(user.id());
-        UserTasksDto userTasks = new UserTasksDto(user.email(), period.toString(), tasks);
+    private void generateReport(UserTasksDto userTasks, LocalDate period) {
+        String userEmail = userTasks.userEmail();
 
         try {
             ReportDto dto = kafkaService.sendTasksForSummarization(userTasks);
-            log.info("The report for user '{}' has been successfully generated", user.email());
+            log.info("The report for user '{}' has been successfully generated", userEmail);
             reportService.saveAsGenerated(dto, period);
-            log.info("The report for user '{}' has been successfully saved", user.email());
+            log.info("The report for user '{}' has been successfully saved", userEmail);
         } catch (ReportGenerationException e) {
-            reportService.saveAsFailed(user.email(), period);
-            exceptionHandlerService.handleReportGenerationException(e, user);
+            reportService.saveAsFailed(userEmail, period);
+            exceptionHandlerService.handleReportGenerationException(e, userEmail);
         } catch (DatabaseException e) {
-            exceptionHandlerService.handleDatabaseException(e, user);
+            exceptionHandlerService.handleDatabaseException(e, userEmail);
         }
     }
 
-    private void prepareGeneration(List<UserDto> users, LocalDate period) {
-        List<RawReportDto> rawReports = users.stream()
-                .map(u -> new RawReportDto(u.email(), period, ReportStatus.PREPARING))
-                .toList();
-        reportService.prepareReports(rawReports);
-        log.info("Preparing reports for generation for {} users", users.size());
-    }
+    public List<UserTasksDto> prepareGeneration(LocalDate period) {
+        List<UserTasksDto> userTasks = apiService.getTasksForReport(period);
+        Set<String> processedUsers = reportService.getProcessedRecipients(period);
 
-    private List<UserDto> getUnprocessedUsers(List<UserDto> allUsers, LocalDate period) {
-        Set<String> processedRecipients = reportService.getProcessedRecipients(period);
-        return allUsers.stream()
-                .filter(u -> !processedRecipients.contains(u.email()))
+        List<RawReportDto> rawReports = userTasks.stream()
+                .filter(t -> !processedUsers.contains(t.userEmail()))
+                .map(t -> new RawReportDto(t.userEmail(), period, ReportStatus.PREPARING))
                 .toList();
+
+        reportService.prepareReports(rawReports);
+        log.info("Preparing reports for generation for {} users", userTasks.size());
+        return userTasks;
     }
 }

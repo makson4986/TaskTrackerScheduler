@@ -1,11 +1,12 @@
 package org.makson.tasktrackerscheduler.services;
 
 import lombok.RequiredArgsConstructor;
-import org.makson.tasktrackerscheduler.dto.UserDto;
 import org.makson.tasktrackerscheduler.dto.UserTasksDto;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -13,23 +14,16 @@ import java.util.List;
 public class ApiClientService {
     private final WebClient webClient;
 
-    public List<UserDto> getAllUser() {
-        return webClient
-                .get()
-                .uri("/api/reports/users")
+    public List<UserTasksDto> getTasksForReport(LocalDate period) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/reports/tasks/pending-generation")
+                        .queryParam("period", period)
+                        .build()
+                )
                 .retrieve()
-                .bodyToFlux(UserDto.class)
-                .collectList()
-                .block();
-    }
-
-    public List<UserTasksDto.TaskDto> getUserTasks(int userId) {
-        return webClient
-                .get()
-                .uri("/api/reports/users/{userId}/tasks", userId)
-                .retrieve()
-                .bodyToFlux(UserTasksDto.TaskDto.class)
-                .collectList()
+                .bodyToMono(new ParameterizedTypeReference<List<UserTasksDto>>() {
+                })
                 .block();
     }
 }
