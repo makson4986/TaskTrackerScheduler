@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.makson.tasktrackerscheduler.dto.RawReportDto;
 import org.makson.tasktrackerscheduler.dto.ReportDto;
 import org.makson.tasktrackerscheduler.dto.UserTasksDto;
-import org.makson.tasktrackerscheduler.exceptions.DatabaseException;
-import org.makson.tasktrackerscheduler.exceptions.ReportGenerationException;
 import org.makson.tasktrackerscheduler.models.ReportStatus;
 import org.springframework.stereotype.Service;
 
@@ -36,11 +34,9 @@ public class ReportGenerationService {
             log.info("The report for user '{}' has been successfully generated", userEmail);
             reportService.saveAsGenerated(dto, period);
             log.info("The report for user '{}' has been successfully saved", userEmail);
-        } catch (ReportGenerationException e) {
+        } catch (Exception e) {
             reportService.saveAsFailed(userEmail, period);
-            exceptionHandlerService.handleReportGenerationException(e, userEmail);
-        } catch (DatabaseException e) {
-            exceptionHandlerService.handleDatabaseException(e, userEmail);
+            exceptionHandlerService.handleException(e, userEmail);
         }
     }
 

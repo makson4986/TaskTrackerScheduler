@@ -1,7 +1,6 @@
 package org.makson.tasktrackerscheduler.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.makson.tasktrackerscheduler.exceptions.DatabaseException;
 import org.makson.tasktrackerscheduler.exceptions.ReportGenerationException;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +10,14 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 @Service
 public class ExceptionHandlerService {
+    public void handleException(Exception e, String user) {
+        if (e instanceof ReportGenerationException ex) {
+            handleReportGenerationException(ex, user);
+        } else {
+            handleDatabaseException(e, user);
+        }
+    }
+
     public void handleReportGenerationException(ReportGenerationException e, String user) {
         Throwable cause = e.getCause();
 
@@ -26,7 +33,7 @@ public class ExceptionHandlerService {
         }
     }
 
-    public void handleDatabaseException(DatabaseException e, String user) {
+    public void handleDatabaseException(Exception e, String user) {
         log.error("Database exception for user {}: {}, {}", user, e.getCause(), e.getMessage());
     }
 }
