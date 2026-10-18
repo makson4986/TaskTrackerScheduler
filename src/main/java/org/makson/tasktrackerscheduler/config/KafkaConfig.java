@@ -50,16 +50,16 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ReplyingKafkaTemplate<String, UserTasksDto, ReportDto> replyingKafkaTemplate(
+    public ReplyingKafkaTemplate<String, UserTasksDto, String> replyingKafkaTemplate(
             ProducerFactory<String, UserTasksDto> producerFactory,
-            ConcurrentMessageListenerContainer<String, ReportDto> repliesContainer
+            ConcurrentMessageListenerContainer<String, String> repliesContainer
     ) {
         return new ReplyingKafkaTemplate<>(producerFactory, repliesContainer);
     }
 
     @Bean
-    public ConcurrentMessageListenerContainer<String, ReportDto> repliesContainer(ConcurrentKafkaListenerContainerFactory<String, ReportDto> containerFactory) {
-        ConcurrentMessageListenerContainer<String, ReportDto> repliesContainer = containerFactory.createContainer(summarizationResponsesTopic);
+    public ConcurrentMessageListenerContainer<String, String> repliesContainer(ConcurrentKafkaListenerContainerFactory<String, String> containerFactory) {
+        ConcurrentMessageListenerContainer<String, String> repliesContainer = containerFactory.createContainer(summarizationResponsesTopic);
         repliesContainer.getContainerProperties().setGroupId("summarizationServiceGroup");
         repliesContainer.setAutoStartup(false);
         return repliesContainer;

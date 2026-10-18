@@ -4,5 +4,5 @@ import org.makson.tasktrackerscheduler.models.ReportStatus;
 
 import java.time.LocalDate;
 
-public record RawReportDto(String recipientEmail, LocalDate period, ReportStatus status) {
+public record DraftReportDto(String recipientEmail, LocalDate period, ReportStatus status) {
 }

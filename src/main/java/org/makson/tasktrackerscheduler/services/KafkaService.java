@@ -23,12 +23,12 @@ public class KafkaService {
     private String summarizationRequestsTopic;
     @Value("${spring.kafka.topics.email-sending-tasks}")
     private String emailSendingTasksTopic;
-    private final ReplyingKafkaTemplate<String, UserTasksDto, ReportDto> replyingKafkaTemplate;
+    private final ReplyingKafkaTemplate<String, UserTasksDto, String> replyingKafkaTemplate;
     private final KafkaTemplate<String, ReportDto> kafkaTemplate;
 
-    public ReportDto sendTasksForSummarization(UserTasksDto tasks) {
+    public String sendTasksForSummarization(UserTasksDto tasks) {
         ProducerRecord<String, UserTasksDto> record = new ProducerRecord<>(summarizationRequestsTopic, tasks.userEmail(), tasks);
-        RequestReplyFuture<String, UserTasksDto, ReportDto> replyFuture = replyingKafkaTemplate.sendAndReceive(record, Duration.ofMinutes(2));
+        RequestReplyFuture<String, UserTasksDto, String> replyFuture = replyingKafkaTemplate.sendAndReceive(record, Duration.ofMinutes(2));
         log.info("Tasks for user '{}' for the period '{}' have been sent for summarization", tasks.userEmail(), tasks.period());
 
         try {

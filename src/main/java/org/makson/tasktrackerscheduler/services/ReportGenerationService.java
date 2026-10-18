@@ -2,8 +2,7 @@ package org.makson.tasktrackerscheduler.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.makson.tasktrackerscheduler.dto.RawReportDto;
-import org.makson.tasktrackerscheduler.dto.ReportDto;
+import org.makson.tasktrackerscheduler.dto.DraftReportDto;
 import org.makson.tasktrackerscheduler.dto.UserTasksDto;
 import org.makson.tasktrackerscheduler.models.ReportStatus;
 import org.springframework.stereotype.Service;
@@ -27,16 +26,16 @@ public class ReportGenerationService {
     }
 
     private void generateReport(UserTasksDto userTasks, LocalDate period) {
-        String userEmail = userTasks.userEmail();
+        String recipientEmail = userTasks.userEmail();
 
         try {
-            ReportDto dto = kafkaService.sendTasksForSummarization(userTasks);
-            log.info("The report for user '{}' has been successfully generated", userEmail);
-            reportService.saveAsGenerated(dto, period);
-            log.info("The report for user '{}' has been successfully saved", userEmail);
+            String reportContent = kafkaService.sendTasksForSummarization(userTasks);
+            log.info("The report for user '{}' has been successfully generated", recipientEmail);
+            reportService.saveAsGenerated(recipientEmail, period, reportContent);
+            log.info("The report for user '{}' has been successfully saved", recipientEmail);
         } catch (Exception e) {
-            reportService.saveAsFailed(userEmail, period);
-            exceptionHandlerService.handleException(e, userEmail);
+            reportService.saveAsFailed(recipientEmail, period);
+            exceptionHandlerService.handleException(e, recipientEmail);
         }
     }
 
@@ -44,9 +43,9 @@ public class ReportGenerationService {
         List<UserTasksDto> userTasks = apiService.getTasksForReport(period);
         Set<String> processedUsers = reportService.getProcessedRecipients(period);
 
-        List<RawReportDto> rawReports = userTasks.stream()
+        List<DraftReportDto> rawReports = userTasks.stream()
                 .filter(t -> !processedUsers.contains(t.userEmail()))
-                .map(t -> new RawReportDto(t.userEmail(), period, ReportStatus.PREPARING))
+                .map(t -> new DraftReportDto(t.userEmail(), period, ReportStatus.PREPARING))
                 .toList();
 
         reportService.prepareReports(rawReports);

@@ -1,7 +1,7 @@
 package org.makson.tasktrackerscheduler.services;
 
 import lombok.RequiredArgsConstructor;
-import org.makson.tasktrackerscheduler.dto.RawReportDto;
+import org.makson.tasktrackerscheduler.dto.DraftReportDto;
 import org.makson.tasktrackerscheduler.dto.ReportDto;
 import org.makson.tasktrackerscheduler.mappers.RawReportMapper;
 import org.makson.tasktrackerscheduler.mappers.ReportMapper;
@@ -23,12 +23,13 @@ public class ReportService {
     private final RawReportMapper rawReportMapper;
 
     @Transactional
-    public void saveAsGenerated(ReportDto dto, LocalDate period) {
-        Report report = reportRepository.getByRecipientEmailAndPeriod(dto.recipientEmail(), period);
-        report.setTitle(dto.title());
-        report.setContent(dto.content());
+    public void saveAsGenerated(String recipientEmail, LocalDate period, String content) {
+        Report report = reportRepository.getByRecipientEmailAndPeriod(recipientEmail, period);
+        report.setTitle("Отчет за " + period);
+        report.setContent(content);
         report.setPeriod(period);
         report.setStatus(ReportStatus.GENERATED);
+
         reportRepository.save(report);
     }
 
@@ -40,8 +41,8 @@ public class ReportService {
     }
 
     @Transactional
-    public void prepareReports(List<RawReportDto> rawReports) {
-        reportRepository.saveAll(rawReportMapper.toListModel(rawReports));
+    public void prepareReports(List<DraftReportDto> draftReports) {
+        reportRepository.saveAll(rawReportMapper.toListModel(draftReports));
     }
 
     @Transactional(readOnly = true)
