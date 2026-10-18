@@ -23,9 +23,11 @@ public class KafkaConfig {
     private String summarizationResponsesTopic;
 
     @Bean
-    public NewTopic reportTopic() {
+    public NewTopic emailSendingTasksTopic() {
         return TopicBuilder
                 .name(emailSendingTasksTopic)
+                .partitions(3)
+                .replicas(3)
                 .build();
     }
 
@@ -33,6 +35,8 @@ public class KafkaConfig {
     public NewTopic summarizationRequestsTopic() {
         return TopicBuilder
                 .name(summarizationRequestsTopic)
+                .partitions(3)
+                .replicas(3)
                 .build();
     }
 
@@ -40,6 +44,8 @@ public class KafkaConfig {
     public NewTopic summarizationResponsesTopic() {
         return TopicBuilder
                 .name(summarizationResponsesTopic)
+                .partitions(3)
+                .replicas(3)
                 .build();
     }
 
