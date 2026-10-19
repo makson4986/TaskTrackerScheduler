@@ -39,17 +39,24 @@ public class ReportGenerationService {
         }
     }
 
-    public List<UserTasksDto> prepareGeneration(LocalDate period) {
-        List<UserTasksDto> userTasks = apiService.getTasksForReport(period);
-        Set<String> processedUsers = reportService.getProcessedRecipients(period);
+    private List<UserTasksDto> prepareGeneration(LocalDate period) {
+        List<UserTasksDto> unprocessedUsers = getUnprocessedUsers(period);
 
-        List<DraftReportDto> rawReports = userTasks.stream()
-                .filter(t -> !processedUsers.contains(t.userEmail()))
+        List<DraftReportDto> rawReports = unprocessedUsers.stream()
                 .map(t -> new DraftReportDto(t.userEmail(), period, ReportStatus.PREPARING))
                 .toList();
 
         reportService.prepareReports(rawReports);
-        log.info("Preparing reports for generation for {} users", userTasks.size());
-        return userTasks;
+        log.info("Preparing reports for generation");
+        return unprocessedUsers;
+    }
+
+    private List<UserTasksDto> getUnprocessedUsers(LocalDate period) {
+        List<UserTasksDto> userTasks = apiService.getTasksForReport(period);
+        Set<String> processedUsers = reportService.getProcessedRecipients(period);
+
+        return userTasks.stream()
+                .filter(t -> !processedUsers.contains(t.userEmail()))
+                .toList();
     }
 }
