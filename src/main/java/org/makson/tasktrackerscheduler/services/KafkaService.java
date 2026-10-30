@@ -28,11 +28,11 @@ public class KafkaService {
 
     public String sendTasksForSummarization(UserTasksDto tasks) {
         ProducerRecord<String, UserTasksDto> record = new ProducerRecord<>(summarizationRequestsTopic, tasks.userEmail(), tasks);
-        RequestReplyFuture<String, UserTasksDto, String> replyFuture = replyingKafkaTemplate.sendAndReceive(record, Duration.ofMinutes(2));
+        RequestReplyFuture<String, UserTasksDto, String> replyFuture = replyingKafkaTemplate.sendAndReceive(record, Duration.ofMinutes(1));
         log.info("Tasks for user '{}' for the period '{}' have been sent for summarization", tasks.userEmail(), tasks.period());
 
         try {
-            return replyFuture.get(2, TimeUnit.MINUTES).value();
+            return replyFuture.get(1, TimeUnit.MINUTES).value();
         } catch (Exception e) {
             throw new ReportGenerationException(e);
         }
