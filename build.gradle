@@ -1,12 +1,12 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.1.1'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'io.freefair.lombok' version '9.2.0'
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.lombok)
 }
 
 group = 'org.makson'
-version = '0.0.1-SNAPSHOT'
+version = '0.1.0'
 description = 'TaskTrackerScheduler'
 
 java {
@@ -19,16 +19,14 @@ repositories {
     mavenCentral()
 }
 
-apply from: 'version.gradle'
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation "org.mapstruct:mapstruct:${versions.mapstruct}"
+    implementation libs.mapstruct
 
-    annotationProcessor "org.mapstruct:mapstruct-processor:${versions.mapstruct}"
+    annotationProcessor libs.mapstruct.processor
 
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-kafka-test'

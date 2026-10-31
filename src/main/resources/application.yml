@@ -15,10 +15,10 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
       properties:
-        spring.json.type.mapping: user_tasks:org.makson.tasktrackerscheduler.dto.UserTasksDto
+        spring.json.type.mapping: user_tasks:org.makson.tasktrackerscheduler.dto.UserTasksDto,report:org.makson.tasktrackerscheduler.dto.ReportDto
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
         spring.json.type.mapping: report:org.makson.tasktrackerscheduler.dto.ReportDto
     topics:
