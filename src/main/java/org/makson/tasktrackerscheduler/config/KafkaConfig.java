@@ -15,8 +15,8 @@ import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 
 @Configuration
 public class KafkaConfig {
-    @Value("${spring.kafka.topics.email-sending-tasks}")
-    private String emailSendingTasksTopic;
+    @Value("${spring.kafka.topics.report}")
+    private String reportTopic;
     @Value("${spring.kafka.topics.summarization-requests}")
     private String summarizationRequestsTopic;
     @Value("${spring.kafka.topics.summarization-responses}")
@@ -25,7 +25,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic emailSendingTasksTopic() {
         return TopicBuilder
-                .name(emailSendingTasksTopic)
+                .name(reportTopic)
                 .partitions(3)
                 .replicas(3)
                 .build();

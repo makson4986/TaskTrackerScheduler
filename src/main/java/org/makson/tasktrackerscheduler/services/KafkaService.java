@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 public class KafkaService {
     @Value("${spring.kafka.topics.summarization-requests}")
     private String summarizationRequestsTopic;
-    @Value("${spring.kafka.topics.email-sending-tasks}")
-    private String emailSendingTasksTopic;
+    @Value("${spring.kafka.topics.report}")
+    private String reportTopic;
     private final ReplyingKafkaTemplate<String, UserTasksDto, String> replyingKafkaTemplate;
     private final KafkaTemplate<String, ReportDto> kafkaTemplate;
 
@@ -39,6 +39,6 @@ public class KafkaService {
     }
 
     public void publishReportCreatedEvent(ReportDto report) {
-        kafkaTemplate.send(emailSendingTasksTopic, report.recipientEmail(), report);
+        kafkaTemplate.send(reportTopic, report.recipientEmail(), report);
     }
 }
