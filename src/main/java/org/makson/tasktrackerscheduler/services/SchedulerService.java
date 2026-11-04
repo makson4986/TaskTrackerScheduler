@@ -2,6 +2,7 @@ package org.makson.tasktrackerscheduler.services;
 
 import lombok.RequiredArgsConstructor;
 import org.makson.tasktrackerscheduler.dto.ReportDto;
+import org.makson.tasktrackerscheduler.models.ReportStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class SchedulerService {
     @Scheduled(cron = "0 0 6 * * *")
     public void sendCompletedTask() {
         LocalDate period = LocalDate.now().minusDays(1);
-        List<ReportDto> reports = reportService.getAllReport(period);
+        List<ReportDto> reports = reportService.getAllReport(period, ReportStatus.GENERATED);
         reports.forEach(kafkaService::publishReportCreatedEvent);
     }
 }

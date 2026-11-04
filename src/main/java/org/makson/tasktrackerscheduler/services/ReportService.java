@@ -46,8 +46,8 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReportDto> getAllReport(LocalDate period) {
-        List<Report> reports = reportRepository.getAllByPeriod(period);
+    public List<ReportDto> getAllReport(LocalDate period, ReportStatus reportStatus) {
+        List<Report> reports = reportRepository.getAllByPeriodAndStatus(period, reportStatus);
         return reportMapper.toListDto(reports);
     }
 
