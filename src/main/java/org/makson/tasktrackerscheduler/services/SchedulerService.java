@@ -16,13 +16,13 @@ public class SchedulerService {
     private final ReportService reportService;
     private final KafkaService kafkaService;
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "${spring.scheduler.crons.generation-request}")
     public void sendGenerationRequest() {
         LocalDate period = LocalDate.now().minusDays(1);
         reportGenerationService.generateReports(period);
     }
 
-    @Scheduled(cron = "0 0 6 * * *")
+    @Scheduled(cron = "${spring.scheduler.crons.sending_reports}")
     public void sendCompletedTask() {
         LocalDate period = LocalDate.now().minusDays(1);
         List<ReportDto> reports = reportService.getAllReport(period, ReportStatus.GENERATED);

@@ -25,4 +25,8 @@ spring:
       summarization-requests: ${KAFKA_SUMMARIZATION_REQUESTS_TOPIC}
       summarization-responses: ${KAFKA_SUMMARIZATION_RESPONSES_TOPIC}
       report: ${KAFKA_REPORT_TOPIC}
+  scheduler:
+    crons:
+      generation-request: ${SCHEDULER_CRONS_GENERATION_REQUEST}
+      sending_reports: ${SCHEDULER_CRONS_SENDING_REPORTS}
 task-service-url: ${TASK_BACKEND_URL}
